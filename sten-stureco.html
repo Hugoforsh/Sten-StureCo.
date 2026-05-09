@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sten-StureCo — Pop Mixing Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --warm-white: #FAF7F2;
+    --sand: #E8DFD0;
+    --terracotta: #C4714A;
+    --terracotta-light: #D4876A;
+    --terracotta-dark: #A35A38;
+    --bark: #3D2E1E;
+    --bark-mid: #5C4433;
+    --bark-light: #8B6B55;
+    --sage: #7A8C6E;
+    --sage-light: #A3B394;
+    --gold: #B8963E;
+    --gold-light: #D4AF6A;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--bark);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.5rem 4rem;
+    background: transparent;
+    transition: background 0.4s, padding 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(245, 240, 232, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 1rem 4rem;
+    border-bottom: 1px solid rgba(61,46,30,0.08);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--bark);
+    letter-spacing: 0.01em;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--terracotta); }
+  .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--bark-mid);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--terracotta); }
+  .nav-cta {
+    background: var(--terracotta) !important;
+    color: var(--warm-white) !important;
+    padding: 0.55rem 1.4rem;
+    border-radius: 2px;
+    font-weight: 500 !important;
+    letter-spacing: 0.04em !important;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--terracotta-dark) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 4rem 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 75% 40%, rgba(196,113,74,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 70%, rgba(122,140,110,0.08) 0%, transparent 60%),
+      var(--cream);
+  }
+  .hero-ornament {
+    position: absolute; top: 12%; right: 6%;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    border: 1px solid rgba(196,113,74,0.15);
+    pointer-events: none;
+  }
+  .hero-ornament::before {
+    content: '';
+    position: absolute; inset: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(196,113,74,0.1);
+  }
+  .hero-ornament::after {
+    content: '';
+    position: absolute; inset: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(196,113,74,0.07);
+  }
+  .hero-tag {
+    position: relative;
+    font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--terracotta); font-weight: 500;
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-tag::before {
+    content: '';
+    display: block; width: 32px; height: 1px; background: var(--terracotta);
+  }
+  .hero-headline {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 7vw, 6.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--bark);
+    margin-bottom: 2rem;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  .hero-headline em {
+    font-style: italic;
+    color: var(--terracotta);
+  }
+  .hero-sub {
+    position: relative;
+    font-size: 1rem; color: var(--bark-mid); max-width: 480px;
+    line-height: 1.8; margin-bottom: 3rem; font-weight: 300;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .hero-actions {
+    position: relative;
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+  .btn-primary {
+    display: inline-block;
+    background: var(--bark);
+    color: var(--warm-white);
+    padding: 0.85rem 2.2rem;
+    text-decoration: none;
+    font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--bark-mid); transform: translateY(-1px); }
+  .btn-outline {
+    display: inline-block;
+    border: 1px solid var(--bark-mid);
+    color: var(--bark);
+    padding: 0.85rem 2.2rem;
+    text-decoration: none;
+    font-size: 0.82rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
+    border-radius: 2px;
+    transition: border-color 0.2s, color 0.2s, transform 0.15s;
+  }
+  .btn-outline:hover { border-color: var(--terracotta); color: var(--terracotta); transform: translateY(-1px); }
+  .hero-scroll {
+    position: absolute; bottom: 2.5rem; right: 4rem;
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--bark-light); writing-mode: vertical-rl;
+    display: flex; align-items: center; gap: 0.75rem;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+  .hero-scroll::after {
+    content: '';
+    display: block; width: 1px; height: 48px; background: var(--bark-light);
+    animation: grow 1.5s 1s ease infinite alternate;
+  }
+  @keyframes grow { from { transform: scaleY(0.4); opacity: 0.4; } to { transform: scaleY(1); opacity: 1; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION SCAFFOLD */
+  section { padding: 7rem 4rem; }
+  .section-label {
+    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--terracotta); font-weight: 500;
+    display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;
+  }
+  .section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--terracotta); }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    font-weight: 300; line-height: 1.15;
+    color: var(--bark); margin-bottom: 1.5rem;
+  }
+  .section-title em { font-style: italic; color: var(--terracotta); }
+
+  /* ABOUT */
+  .about { background: var(--warm-white); }
+  .about-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+  }
+  .about-text p {
+    color: var(--bark-mid); font-weight: 300; font-size: 1.05rem; margin-bottom: 1.25rem;
+  }
+  .about-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2.5rem;
+  }
+  .stat-item { border-top: 1px solid var(--sand); padding-top: 1rem; }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 2.8rem; font-weight: 300; color: var(--terracotta); line-height: 1;
+  }
+  .stat-desc { font-size: 0.8rem; color: var(--bark-light); letter-spacing: 0.04em; margin-top: 0.25rem; }
+  .about-visual {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .about-frame {
+    width: 100%; aspect-ratio: 3/4; max-width: 380px;
+    background: var(--sand);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .about-frame-inner {
+    font-family: var(--font-display);
+    font-size: 1rem; font-style: italic;
+    color: var(--bark-light); text-align: center; padding: 2rem;
+  }
+  .about-frame::before {
+    content: '';
+    position: absolute; inset: 16px;
+    border: 1px solid rgba(61,46,30,0.12);
+    border-radius: 2px; pointer-events: none;
+  }
+  .about-badge {
+    position: absolute; bottom: -1.5rem; left: -1.5rem;
+    background: var(--terracotta);
+    color: var(--warm-white);
+    padding: 1.25rem 1.5rem;
+    border-radius: 2px;
+    font-family: var(--font-display);
+    font-size: 0.95rem; font-style: italic;
+    max-width: 180px; line-height: 1.4;
+  }
+
+  /* PORTFOLIO */
+  .portfolio { background: var(--cream); }
+  .portfolio-inner { max-width: 1200px; margin: 0 auto; }
+  .portfolio-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
+  .portfolio-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;
+  }
+  .track-card {
+    background: var(--warm-white);
+    border: 1px solid rgba(61,46,30,0.08);
+    border-radius: 4px;
+    padding: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .track-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--terracotta); opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .track-card:hover { transform: translateY(-3px); }
+  .track-card:hover::before { opacity: 1; }
+  .track-genre {
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--terracotta); font-weight: 500; margin-bottom: 0.75rem;
+  }
+  .track-title {
+    font-family: var(--font-display);
+    font-size: 1.35rem; font-weight: 400; color: var(--bark);
+    margin-bottom: 0.25rem;
+  }
+  .track-artist { font-size: 0.85rem; color: var(--bark-light); margin-bottom: 1.25rem; }
+  .waveform {
+    height: 48px; display: flex; align-items: center; gap: 2px;
+    margin-bottom: 1rem; cursor: pointer;
+  }
+  .waveform-bar {
+    flex: 1; background: var(--sand);
+    border-radius: 1px;
+    transition: background 0.1s;
+    min-height: 4px;
+  }
+  .waveform:hover .waveform-bar { background: var(--terracotta-light); }
+  .track-meta { display: flex; justify-content: space-between; align-items: center; }
+  .track-duration { font-size: 0.78rem; color: var(--bark-light); }
+  .play-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bark); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .play-btn:hover { background: var(--terracotta); transform: scale(1.05); }
+  .play-btn svg { width: 12px; height: 12px; fill: var(--warm-white); margin-left: 2px; }
+
+  /* SERVICES */
+  .services { background: var(--bark); }
+  .services .section-label { color: var(--gold-light); }
+  .services .section-label::before { background: var(--gold-light); }
+  .services .section-title { color: var(--warm-white); }
+  .services .section-title em { color: var(--gold-light); }
+  .services-inner { max-width: 1200px; margin: 0 auto; }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3.5rem; }
+  .service-card {
+    border: 1px solid rgba(245,240,232,0.1);
+    border-radius: 4px;
+    padding: 2rem;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .service-card:hover { border-color: rgba(184,150,62,0.4); background: rgba(245,240,232,0.03); }
+  .service-card.featured { border-color: rgba(184,150,62,0.5); background: rgba(184,150,62,0.06); }
+  .service-tag {
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold-light); font-weight: 500; margin-bottom: 1.25rem;
+  }
+  .service-name {
+    font-family: var(--font-display);
+    font-size: 1.6rem; font-weight: 300; color: var(--warm-white);
+    margin-bottom: 0.75rem;
+  }
+  .service-desc { font-size: 0.88rem; color: rgba(245,240,232,0.6); line-height: 1.75; margin-bottom: 1.5rem; font-weight: 300; }
+  .service-price {
+    font-family: var(--font-display);
+    font-size: 2rem; font-weight: 300; color: var(--gold-light);
+  }
+  .service-price span { font-size: 0.9rem; color: rgba(245,240,232,0.4); font-family: var(--font-body); }
+  .service-includes { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(245,240,232,0.08); }
+  .service-includes li {
+    font-size: 0.82rem; color: rgba(245,240,232,0.55); padding: 0.3rem 0;
+    display: flex; align-items: center; gap: 0.5rem; list-style: none; font-weight: 300;
+  }
+  .service-includes li::before { content: '—'; color: var(--gold); flex-shrink: 0; }
+  .popular-badge {
+    position: absolute; top: -1px; right: 1.5rem;
+    background: var(--gold);
+    color: var(--bark);
+    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0 0 2px 2px;
+  }
+
+  /* PROCESS */
+  .process { background: var(--warm-white); }
+  .process-inner { max-width: 1200px; margin: 0 auto; }
+  .process-steps { margin-top: 3.5rem; display: flex; flex-direction: column; gap: 0; }
+  .process-step {
+    display: grid; grid-template-columns: 80px 1fr; gap: 2rem;
+    padding: 2rem 0; border-top: 1px solid var(--sand);
+  }
+  .process-step:last-child { border-bottom: 1px solid var(--sand); }
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 3rem; font-weight: 300; color: var(--sand);
+    line-height: 1; padding-top: 0.2rem;
+    transition: color 0.3s;
+  }
+  .process-step:hover .step-num { color: var(--terracotta-light); }
+  .step-content {}
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem; font-weight: 400; color: var(--bark); margin-bottom: 0.5rem;
+  }
+  .step-desc { font-size: 0.9rem; color: var(--bark-mid); font-weight: 300; max-width: 560px; }
+
+  /* TESTIMONIALS */
+  .testimonials { background: var(--cream); }
+  .testimonials-inner { max-width: 1200px; margin: 0 auto; }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .testimonial-card {
+    background: var(--warm-white);
+    border: 1px solid rgba(61,46,30,0.07);
+    border-radius: 4px; padding: 2rem;
+  }
+  .testimonial-quote {
+    font-family: var(--font-display);
+    font-size: 1.15rem; font-style: italic; font-weight: 300;
+    color: var(--bark); line-height: 1.7; margin-bottom: 1.5rem;
+  }
+  .testimonial-quote::before { content: '\201C'; color: var(--terracotta); font-size: 1.5em; line-height: 0; vertical-align: -0.3em; margin-right: 0.1em; }
+  .testimonial-author { font-size: 0.82rem; color: var(--bark-light); }
+  .testimonial-author strong { display: block; color: var(--bark); font-weight: 500; margin-bottom: 0.1rem; }
+
+  /* CONTACT */
+  .contact { background: var(--bark); }
+  .contact-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+  .contact .section-label { justify-content: center; }
+  .contact .section-label::before { display: none; }
+  .contact .section-title { color: var(--warm-white); }
+  .contact .section-title em { color: var(--gold-light); }
+  .contact-sub { font-size: 1rem; color: rgba(245,240,232,0.55); margin-bottom: 3rem; font-weight: 300; max-width: 500px; margin-left: auto; margin-right: auto; }
+  .contact-form { text-align: left; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+  .form-group label {
+    font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(245,240,232,0.5); font-weight: 400;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    background: rgba(245,240,232,0.05);
+    border: 1px solid rgba(245,240,232,0.12);
+    border-radius: 2px;
+    padding: 0.85rem 1rem;
+    color: var(--warm-white);
+    font-family: var(--font-body);
+    font-size: 0.92rem; font-weight: 300;
+    transition: border-color 0.2s;
+    outline: none;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(245,240,232,0.25); }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: rgba(184,150,62,0.5); }
+  .form-group select { cursor: pointer; }
+  .form-group select option { background: var(--bark); color: var(--warm-white); }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .btn-submit {
+    width: 100%;
+    background: var(--terracotta);
+    color: var(--warm-white);
+    border: none; cursor: pointer;
+    padding: 1rem 2rem;
+    font-family: var(--font-body);
+    font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.15s;
+    margin-top: 0.5rem;
+  }
+  .btn-submit:hover { background: var(--terracotta-dark); transform: translateY(-1px); }
+  .contact-alt { margin-top: 2.5rem; text-align: center; font-size: 0.85rem; color: rgba(245,240,232,0.35); }
+  .contact-alt a { color: var(--gold-light); text-decoration: none; }
+  .contact-alt a:hover { text-decoration: underline; }
+
+  /* FOOTER */
+  footer {
+    background: var(--bark);
+    border-top: 1px solid rgba(245,240,232,0.08);
+    padding: 2rem 4rem;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 1.1rem; font-weight: 600; color: var(--warm-white);
+  }
+  .footer-logo span { color: var(--terracotta); }
+  .footer-copy { font-size: 0.78rem; color: rgba(245,240,232,0.3); }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { font-size: 0.78rem; color: rgba(245,240,232,0.4); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--terracotta-light); }
+
+  .studio-invite {
+    margin-top: 3rem;
+    background: rgba(196,113,74,0.08);
+    border: 1px solid rgba(196,113,74,0.2);
+    border-radius: 4px;
+    padding: 1.75rem 2rem;
+  }
+  .studio-invite-inner { display: flex; align-items: flex-start; gap: 1.5rem; }
+  .studio-invite-icon { font-size: 2rem; color: var(--terracotta); flex-shrink: 0; line-height: 1; margin-top: 0.15rem; }
+  .studio-invite-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 400; color: var(--bark); margin-bottom: 0.4rem; }
+  .studio-invite-text { font-size: 0.88rem; color: var(--bark-mid); font-weight: 300; line-height: 1.75; max-width: 580px; }
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  @media (max-width: 768px) {
+    nav { padding: 1.25rem 1.5rem; }
+    nav.scrolled { padding: 0.875rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4.5rem 1.5rem; }
+    .hero { padding: 0 1.5rem 4rem; }
+    .about-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .about-visual { display: none; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { padding: 1.5rem; flex-direction: column; text-align: center; }
+    .hero-scroll { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">Sten-Sture<span>Co.</span></a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#portfolio">Work</a>
+    <a href="#services">Services</a>
+    <a href="#process">Process</a>
+    <a href="#contact" class="nav-cta">Get in touch</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-ornament"></div>
+  <div class="hero-tag">Stockholm · Södermalm · Pop Mixing Engineer</div>
+  <h1 class="hero-headline">
+    Every song<br>deserves someone<br>who <em>listens.</em>
+  </h1>
+  <p class="hero-sub">
+    I'm a mixing engineer based in Stockholm with nine years in the studio.
+    I work closely with artists and producers — in person when possible,
+    remotely when not — to find the mix that feels true to the song.
+  </p>
+  <div class="hero-actions">
+    <a href="#portfolio" class="btn-primary">Hear my work</a>
+    <a href="#contact" class="btn-outline">Start a conversation</a>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="about-text">
+      <div class="section-label reveal">About</div>
+      <h2 class="section-title reveal reveal-delay-1">I care about<br>your song. <em>Genuinely.</em></h2>
+      <p class="reveal reveal-delay-2">
+        My name is Sten-Sture. I've been making music for nine years — producing, mixing,
+        mastering — and the thing that's never changed is how much I care about getting it
+        right. Not just technically right. Emotionally right. The mix that makes you feel
+        the song the way you felt it when you first wrote it.
+      </p>
+      <p class="reveal reveal-delay-2">
+        I'm based in Södermalm, Stockholm, and I love working with artists face to face.
+        If you're in the city, come into the studio. Sit with the speakers, hear it in
+        the room, tell me what you're feeling. Some of my favourite mixes have come from
+        those conversations — the ones you can't have over email.
+      </p>
+      <p class="reveal reveal-delay-2">
+        For artists further away, we work remotely — but I always make time for a proper
+        call before we begin. I want to understand the song, not just the stems.
+      </p>
+      <div class="about-stats reveal reveal-delay-3">
+        <div class="stat-item">
+          <div class="stat-num">9+</div>
+          <div class="stat-desc">Years in the studio</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">200+</div>
+          <div class="stat-desc">Mixes delivered</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">Sthlm</div>
+          <div class="stat-desc">Södermalm studio</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">Pop</div>
+          <div class="stat-desc">Deep specialisation</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual reveal reveal-delay-2">
+      <div class="about-frame">
+        <div class="about-frame-inner">
+          Add your studio photo<br>here
+        </div>
+        <div class="about-badge">"The best mixes come from real conversations."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section class="portfolio" id="portfolio">
+  <div class="portfolio-inner">
+    <div class="portfolio-header">
+      <div>
+        <div class="section-label reveal">Portfolio</div>
+        <h2 class="section-title reveal reveal-delay-1">Recent <em>work.</em></h2>
+      </div>
+      <p class="reveal" style="font-size:0.88rem;color:var(--bark-light);max-width:300px;font-weight:300;line-height:1.7;">
+        A selection of recent mixes. Replace these with your SoundCloud or Waveform.com embeds.
+      </p>
+    </div>
+    <div class="portfolio-grid" id="portfolio-grid"></div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="services-inner">
+    <div class="section-label reveal">Working together</div>
+    <h2 class="section-title reveal reveal-delay-1">How we can <em>work.</em></h2>
+    <p class="reveal reveal-delay-2" style="color:rgba(245,240,232,0.55);font-weight:300;max-width:540px;margin-top:0.5rem;font-size:1rem;line-height:1.8;">
+      Every collaboration starts with a conversation. Whether you come into the studio here in Stockholm
+      or we work across distance, the process is always personal.
+    </p>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-tag">In the room</div>
+        <div class="service-name">Studio Session</div>
+        <div class="service-desc">You come to Södermalm and we mix together. You hear every decision in real time, on good speakers, in a room where you can say "no, more of that feeling." This is my favourite way to work.</div>
+        <div class="service-price">Let's talk <span>/ session</span></div>
+        <ul class="service-includes">
+          <li>Full day or half-day sessions</li>
+          <li>Mix in the room, together</li>
+          <li>Coffee, time, and honest ears</li>
+          <li>Stockholm, Södermalm</li>
+        </ul>
+      </div>
+      <div class="service-card featured reveal reveal-delay-1">
+        <div class="popular-badge">Most popular</div>
+        <div class="service-tag">Mix + Master</div>
+        <div class="service-name">Full Package</div>
+        <div class="service-desc">A call first, to understand the song properly. Then the mix, the master, and as many rounds of conversation as it takes to get it right. Delivered ready for release.</div>
+        <div class="service-price">€220 <span>/ track</span></div>
+        <ul class="service-includes">
+          <li>Introductory call included</li>
+          <li>Mix with 2 revision rounds</li>
+          <li>Stem mastering</li>
+          <li>Streaming-ready delivery</li>
+        </ul>
+      </div>
+      <div class="service-card reveal reveal-delay-2">
+        <div class="service-tag">Mixing only</div>
+        <div class="service-name">Single Mix</div>
+        <div class="service-desc">Your stems, mixed with care. I'll listen to what you've made, understand where you want to go, and bring it there. Two revision rounds included — most people only need one.</div>
+        <div class="service-price">€150 <span>/ track</span></div>
+        <ul class="service-includes">
+          <li>Introductory call included</li>
+          <li>2 revision rounds</li>
+          <li>Stereo WAV + MP3 delivery</li>
+          <li>Rush turnaround available</li>
+        </ul>
+      </div>
+    </div>
+    <p class="reveal" style="color:rgba(245,240,232,0.3);font-size:0.82rem;margin-top:2rem;font-weight:300;text-align:center;">
+      Not sure which fits? Just write to me. We'll figure it out together.
+    </p>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process">
+  <div class="process-inner">
+    <div class="section-label reveal">The process</div>
+    <h2 class="section-title reveal reveal-delay-1">It starts with a <em>conversation.</em></h2>
+    <div class="process-steps">
+      <div class="process-step reveal">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">We talk about the song</div>
+          <div class="step-desc">Before anything else, I want to understand what you've made and where you want to take it. A short call, a voice note, a few emails — whatever feels natural. This is where I start listening, before the stems even arrive.</div>
+        </div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">In the studio — together or apart</div>
+          <div class="step-desc">If you're in Stockholm, come in. Sit with the monitors, drink coffee, and hear your music in the room. If you're further away, send your stems and I'll mix with the same care — just without the coffee on your end.</div>
+        </div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">You hear it — and we talk again</div>
+          <div class="step-desc">I'll send a private link to stream the first mix. Then I want to hear what you think — not just "can you turn up the snare" but how it feels. Two revision rounds are included. I've never once minded a third if something isn't right.</div>
+        </div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">Your music, ready to go</div>
+          <div class="step-desc">When you're happy — genuinely happy — I deliver the final files. WAV and MP3, clearly named, ready for mastering or straight to release. That's it. No invoice surprises, no chasing.</div>
+        </div>
+      </div>
+    </div>
+    <div class="studio-invite reveal">
+      <div class="studio-invite-inner">
+        <div class="studio-invite-icon">&#9834;</div>
+        <div>
+          <div class="studio-invite-title">Stockholm artists — come to the studio</div>
+          <div class="studio-invite-text">The studio is in Södermalm. If you'd rather hear your music on a real pair of monitors than through laptop speakers, you're always welcome to come in. Reach out and we'll find a time that works.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="testimonials-inner">
+    <div class="section-label reveal">Testimonials</div>
+    <h2 class="section-title reveal reveal-delay-1">What artists <em>say.</em></h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="testimonial-quote">The mix came back and I genuinely couldn't believe it was my song. The vocal sat in a way I'd never heard before. Exactly what I was going for.</div>
+        <div class="testimonial-author"><strong>Artist Name</strong>Pop Artist · Stockholm</div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="testimonial-quote">Fast, professional, and the low end is immaculate. I've worked with a lot of engineers — the attention to detail here is rare.</div>
+        <div class="testimonial-author"><strong>Producer Name</strong>Producer · London</div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="testimonial-quote">Sent the stems on a Tuesday, had the finished mix by Thursday morning. Sounded better than mixes I've paid three times as much for.</div>
+        <div class="testimonial-author"><strong>Artist Name</strong>Singer-Songwriter · Oslo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="section-label">Let's talk</div>
+    <h2 class="section-title">Tell me about<br>your <em>music.</em></h2>
+    <p class="contact-sub">
+      No forms, no funnels. Just write to me about what you're working on —
+      where you are with it, what you're hoping for, whatever feels relevant.
+      I'll write back personally, usually the same day.
+    </p>
+    <div class="contact-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Your name</label>
+          <input type="text" placeholder="What do people call you?">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="your@email.com">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Are you based in Stockholm?</label>
+        <select>
+          <option value="" disabled selected>Choose one</option>
+          <option>Yes — I'd love to come into the studio</option>
+          <option>I'm nearby, maybe</option>
+          <option>No, I'm elsewhere in Sweden</option>
+          <option>No, I'm outside Sweden</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tell me about the music</label>
+        <textarea placeholder="What are you making? Where is it at? What do you feel it needs? Share as much or as little as you like — there's no wrong answer here."></textarea>
+      </div>
+      <button class="btn-submit" type="button" onclick="handleSubmit()">Send it over</button>
+      <div class="contact-alt">
+        Prefer email? <a href="mailto:hello@sten-stureco.com">hello@sten-stureco.com</a>
+        &nbsp;·&nbsp; Studio in Södermalm, Stockholm
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Sten-Sture<span>Co.</span></div>
+  <div class="footer-copy">© 2025 Sten-StureCo. Stockholm, Sweden.</div>
+  <div class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">SoundBetter</a>
+    <a href="#">TikTok</a>
+  </div>
+</footer>
+
+<script>
+/* NAV scroll behaviour */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* Portfolio tracks */
+const tracks = [
+  { genre: 'Uptempo Pop', title: 'Track Title', artist: 'Artist Name', duration: '3:24' },
+  { genre: 'Dance-Pop', title: 'Track Title', artist: 'Artist Name', duration: '2:58' },
+  { genre: 'Pop Ballad', title: 'Track Title', artist: 'Artist Name', duration: '4:01' },
+  { genre: 'RnB-Pop', title: 'Track Title', artist: 'Artist Name', duration: '3:17' },
+  { genre: 'Synth-Pop', title: 'Track Title', artist: 'Artist Name', duration: '3:45' },
+  { genre: 'Pop', title: 'Track Title', artist: 'Artist Name', duration: '3:31' },
+];
+
+function generateBars(count, seed) {
+  let html = '';
+  for (let i = 0; i < count; i++) {
+    const h = 8 + Math.abs(Math.sin(seed + i * 0.7) * 36);
+    html += `<div class="waveform-bar" style="height:${Math.round(h)}px"></div>`;
+  }
+  return html;
+}
+
+const grid = document.getElementById('portfolio-grid');
+tracks.forEach((t, i) => {
+  const card = document.createElement('div');
+  card.className = `track-card reveal${i % 3 !== 0 ? ' reveal-delay-' + (i % 3) : ''}`;
+  card.innerHTML = `
+    <div class="track-genre">${t.genre}</div>
+    <div class="track-title">${t.title}</div>
+    <div class="track-artist">${t.artist}</div>
+    <div class="waveform">${generateBars(48, i * 13.7)}</div>
+    <div class="track-meta">
+      <span class="track-duration">${t.duration}</span>
+      <button class="play-btn" aria-label="Play ${t.title}">
+        <svg viewBox="0 0 12 14"><path d="M1 1l10 6-10 6V1z"/></svg>
+      </button>
+    </div>
+  `;
+  grid.appendChild(card);
+});
+
+/* Scroll reveal */
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+revealEls.forEach(el => observer.observe(el));
+
+/* Form submit */
+function handleSubmit() {
+  const btn = document.querySelector('.btn-submit');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = 'Sent — I\'ll be in touch soon';
+    btn.style.background = '#7A8C6E';
+  }, 1200);
+}
+</script>
+</body>
+</html>
